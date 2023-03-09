@@ -47,7 +47,7 @@ class SubscriptionResolverProvider implements ProvidesSubscriptionResolver
         }
 
         $namespacesToTry = RootType::defaultNamespaces($fieldValue->getParentName());
-        $className = Utils::namespaceClassname(
+        $classNameFQN = Utils::namespaceClassname(
             $className,
             $namespacesToTry,
             function (string $class): bool {
@@ -55,16 +55,16 @@ class SubscriptionResolverProvider implements ProvidesSubscriptionResolver
             }
         );
 
-        if (! $className) {
+        if (! $classNameFQN) {
             $subscriptionClass = GraphQLSubscription::class;
             $consideredNamespaces = implode(', ', $namespacesToTry);
             throw new DefinitionException(
                 "Failed to find class {$className} extends {$subscriptionClass} in namespaces [{$consideredNamespaces}] for the subscription field {$fieldName}"
             );
         }
-        assert(is_subclass_of($className, GraphQLSubscription::class));
+        assert(is_subclass_of($classNameFQN, GraphQLSubscription::class));
 
-        $subscription = Container::getInstance()->make($className);
+        $subscription = Container::getInstance()->make($classNameFQN);
         /** @var \Nuwave\Lighthouse\Schema\Types\GraphQLSubscription $subscription PHPStan thinks it is *NEVER* with Laravel 9 */
         assert($subscription instanceof GraphQLSubscription);
 

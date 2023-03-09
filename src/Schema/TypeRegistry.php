@@ -372,14 +372,14 @@ class TypeRegistry
 
         $namespacesToTry = (array) config('lighthouse.namespaces.scalars');
 
-        $className = Utils::namespaceClassname(
+        $classNameFQN = Utils::namespaceClassname(
             $className,
             $namespacesToTry,
             function (string $className): bool {
                 return is_subclass_of($className, ScalarType::class);
             }
         );
-        assert(is_null($className) || is_subclass_of($className, ScalarType::class));
+        assert(is_null($classNameFQN) || is_subclass_of($classNameFQN, ScalarType::class));
 
         if (! $className) {
             $scalarClass = ScalarType::class;
@@ -389,7 +389,7 @@ class TypeRegistry
             );
         }
 
-        return new $className([
+        return new $classNameFQN([
             'name' => $scalarName,
             'description' => $scalarDefinition->description->value ?? null,
             'astNode' => $scalarDefinition,
